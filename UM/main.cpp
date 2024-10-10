@@ -34,64 +34,14 @@ void RemoveScrollbar() {
 	}
 }
 
-std::string uniqueName() {
-	auto randchar = []() -> char
-		{
-			const char charset[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-			const size_t max_index = (sizeof(charset) - 1);
-			return charset[rand() % max_index];
-		};
-	std::string str(4, 0);
-	std::generate_n(str.begin(), 4, randchar);
-	return str;
-}
-
-void ExecuteCommand(const std::string& command) {
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
-	ZeroMemory(&si, sizeof(si));
-	si.cb = sizeof(si);
-
-	if (CreateProcess(NULL, const_cast<LPSTR>(command.c_str()), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
-		WaitForSingleObject(pi.hProcess, INFINITE);
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
-	}
-	else {
-		std::cerr << "CreateProcess failed (" << GetLastError() << ").\n";
-	}
-}
-
-void DeletePartition(const std::string& partitionName) {
-	std::ofstream script("delete_partition.txt");
-	script << "select volume " << partitionName << "\n";
-	script << "delete volume\n";
-	script.close();
-
-	ExecuteCommand("diskpart /s delete_partition.txt");
-	DeleteFile("delete_partition.txt");
-}
-
-void CR3Thread() {
-	while (true) {
-		__int64 RfCheck = Driver->RPM<__int64>(Driver->BaseAddress);
-		if (RfCheck == NULL) {
-			Driver->CacheCR3();
-			Driver->BaseAddress = Driver->FindBaseAddress();
-			Driver->ProcessID = Driver->FindProcessID(xorstr_("r5apex.exe"));
-		}
-		Sleep(500);
-	}
-}
-
 INT APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT nCmdShow)
 {
 	AllocConsole();
 	FILE* fp;
 	freopen_s(&fp, E("CONOUT$"), E("w"), stdout);
 	
-	std::string TitleV = uniqueName();
-	SetConsoleTitleA(TitleV.c_str());
+	// std::string TitleV = uniqueName();
+	SetConsoleTitleA("58236");
 	HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	HWND consoleApp = GetConsoleWindow();
 	
