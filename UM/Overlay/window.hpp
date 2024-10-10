@@ -1,330 +1,169 @@
-// Made by Ítalo Seara (https://github.com/italoseara)
-
-#ifndef OVERLAY_HPP
-#define OVERLAY_HPP
-#define STB_IMAGE_IMPLEMENTATION
-
-#include "../Lib/fonts.hpp"
-
-#include <Windows.h>
+#include "../Includes.h"
 #include <dwmapi.h>
-#include <d3d11.h>
-#include <iostream>
-#include <D3DX11tex.h>
 
-#include <Lmcons.h>
-#include <filesystem>
-
-#include "../Lib/imgui/imgui.h"
-#include "../Lib/imgui/imgui_impl_dx11.h"
-#include "../Lib/imgui/imgui_impl_win32.h"
-
-#include "../Driver/UTILS/skCrypt.h"
-
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-bool WroteFonts = false;
+LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace Overlay
 {
-    HINSTANCE hInstance = nullptr;
-    INT nCmdShow = 1;
-    void (*drawLoop)();
+	HWND hwnd;
 
-    // Window
-    HWND window = nullptr;
-    int width = 0;
-    int height = 0;
+	static LPDIRECT3D9              g_pD3D = nullptr;
+	static LPDIRECT3DDEVICE9        g_pd3dDevice = nullptr;
+	static UINT                     g_ResizeWidth = 0, g_ResizeHeight = 0;
+	static D3DPRESENT_PARAMETERS    g_d3dpp = {};
 
-    // DirectX
-    IDXGISwapChain* swapChain = nullptr;
-    ID3D11Device* device = nullptr;
-    ID3D11DeviceContext* deviceContext = nullptr;
-    ID3D11RenderTargetView* renderTargetView = nullptr;
+	bool CreateDeviceD3D(HWND hWnd);
+	void ResetDevice();
 
-    D3DX11_IMAGE_LOAD_INFO info;
-    ID3DX11ThreadPump* pump{ nullptr };
+	bool Begin()
+	{
+		SPOOF_FUNC;
+		hwnd = FindWindowA(E("OOPO_WINDOWS_CLASS"), E("ow overlay")); // Overwolf Teamspeak/Recorder Plugin
+		if (!hwnd)
+			return false;
+		MARGINS margin = { -1 };
+		DwmExtendFrameIntoClientArea(hwnd, &margin);
+		SetWindowPos(hwnd, 0, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), SWP_SHOWWINDOW);
 
-    LRESULT CALLBACK WindowProcedure(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
-    {
-        if (ImGui_ImplWin32_WndProcHandler(window, message, wParam, lParam))
-            return 0L;
+		if (!CreateDeviceD3D(hwnd))
+		{
+			if (g_pd3dDevice) { g_pd3dDevice->Release(); g_pd3dDevice = nullptr; }
+			if (g_pD3D) { g_pD3D->Release(); g_pD3D = nullptr; }
+			return false;
+		}
 
-        if (message == WM_DESTROY)
-        {
-            PostQuitMessage(0);
-            return 0L;
-        }
+		ShowWindow(hwnd, SW_SHOW);
+		UpdateWindow(hwnd);
 
-        return DefWindowProc(window, message, wParam, lParam);
-    }
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
-    void InitializeWindow()
-    {
-        WNDCLASSEXW wc{};
-        wc.cbSize = sizeof(WNDCLASSEXW);
-        wc.style = CS_HREDRAW | CS_VREDRAW;
-        wc.lpfnWndProc = WindowProcedure;
-        wc.hInstance = hInstance;
-        wc.lpszClassName = L"UL";
-        if (!RegisterClassExW(&wc))
-        {
-            std::cerr << E("Failed to register window class.") << std::endl;
-            exit(1);
-        }
+		ImGui::StyleColorsDark();
 
-        width = GetSystemMetrics(SM_CXSCREEN);
-        height = GetSystemMetrics(SM_CYSCREEN);
-        window = CreateWindowExW(
-            WS_EX_TOPMOST | WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW,
-            wc.lpszClassName,
-            L"U",
-            WS_POPUP,
-            0, 0,
-            width, height,
-            nullptr,
-            nullptr,
-            wc.hInstance,
-            nullptr
-        );
+		ImGui_ImplWin32_Init(hwnd);
+		ImGui_ImplDX9_Init(g_pd3dDevice);
+	}
 
-        if (!window)
-        {
-            std::cerr << E("Failed to create window.") << std::endl;
-            exit(1);
-        }
+	bool StartRender()
+	{
+		SPOOF_FUNC;
+		MSG msg;
+		if (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
+		{
+			::TranslateMessage(&msg);
+			::DispatchMessage(&msg);
+			if (msg.message == WM_QUIT)
+				return false;
+		}
 
-        SetLayeredWindowAttributes(window, RGB(0, 0, 0), BYTE(255), LWA_ALPHA);
+		if (g_ResizeWidth != 0 && g_ResizeHeight != 0)
+		{
+			g_d3dpp.BackBufferWidth = g_ResizeWidth;
+			g_d3dpp.BackBufferHeight = g_ResizeHeight;
+			g_ResizeWidth = g_ResizeHeight = 0;
+			ResetDevice();
+		}
 
-        {
-            RECT clientArea{};
-            if (!GetClientRect(window, &clientArea))
-            {
-                std::cerr << E("Failed to get client area.") << std::endl;
-                exit(1);
-            }
+		ImGui_ImplDX9_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
 
-            RECT windowArea{};
-            if (!GetWindowRect(window, &windowArea))
-            {
-                std::cerr << E("Failed to get window rect.") << std::endl;
-                exit(1);
-            }
+		return true;
+	}
 
-            POINT diff{};
-            if (!ClientToScreen(window, &diff))
-            {
-                std::cerr << E("Failed to convert client to screen.") << std::endl;
-                exit(1);
-            }
+	void EndRender()
+	{
+		SPOOF_FUNC;
+		ImGui::EndFrame();
+		g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
+		g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+		g_pd3dDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
+		g_pd3dDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
+		if (g_pd3dDevice->BeginScene() >= 0)
+		{
+			ImGui::Render();
+			ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+			g_pd3dDevice->EndScene();
+		}
+		HRESULT result = g_pd3dDevice->Present(nullptr, nullptr, nullptr, nullptr);
 
-            const MARGINS margins{
-                windowArea.left + (diff.x - windowArea.left),
-                windowArea.top + (diff.y - windowArea.top),
-                clientArea.right,
-                clientArea.bottom
-            };
-
-            if (FAILED(DwmExtendFrameIntoClientArea(window, &margins)))
-            {
-                std::cerr << E("Failed to extend frame into client area.") << std::endl;
-                exit(1);
-            }
-        }
-
-        ShowWindow(window, nCmdShow);
-        UpdateWindow(window);
-    }
-
-    void InitializeDirectX()
-    {
-        DXGI_SWAP_CHAIN_DESC sd{};
-        sd.BufferDesc.RefreshRate.Numerator = 60U;
-        sd.BufferDesc.RefreshRate.Denominator = 1U;
-        sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        sd.SampleDesc.Count = 1U;
-        sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-        sd.BufferCount = 1U;
-        sd.OutputWindow = window;
-        sd.Windowed = TRUE;
-        sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-        sd.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-
-        constexpr D3D_FEATURE_LEVEL levels[2]{
-            D3D_FEATURE_LEVEL_11_0,
-            D3D_FEATURE_LEVEL_10_0,
-        };
-
-        if (FAILED(D3D11CreateDeviceAndSwapChain(
-            nullptr,
-            D3D_DRIVER_TYPE_HARDWARE,
-            nullptr,
-            0U,
-            levels,
-            2U,
-            D3D11_SDK_VERSION,
-            &sd,
-            &swapChain,
-            &device,
-            nullptr,
-            &deviceContext)))
-        {
-            std::cerr << E("Failed to create device and swap chain.") << std::endl;
-            exit(1);
-        }
-
-        ID3D11Texture2D* backBuffer{ nullptr };
-        if (FAILED(swapChain->GetBuffer(0U, IID_PPV_ARGS(&backBuffer))))
-        {
-            std::cerr << E("Failed to get swap chain buffer.") << std::endl;
-            exit(1);
-        }
-
-        if (backBuffer)
-        {
-            if (FAILED(device->CreateRenderTargetView(backBuffer, nullptr, &renderTargetView)))
-            {
-                std::cerr << E("Failed to create render target view.") << std::endl;
-                exit(1);
-            }
-            backBuffer->Release();
-        }
-        else
-        {
-            std::cerr << E("Failed to get back buffer.") << std::endl;
-            exit(1);
-        }
-    }
-
-    void InitializeImGui()
-    {
-        if (!ImGui::CreateContext())
-        {
-            std::cerr << E("Failed to create ImGui context.") << std::endl;
-            exit(1);
-        }
-        ImGui::StyleColorsDark();
-
-        if (!ImGui_ImplWin32_Init(window))
-        {
-            std::cerr << E("Failed to initialize ImGui Win32.") << std::endl;
-            exit(1);
-        }
-        if (!ImGui_ImplDX11_Init(device, deviceContext))
-        {
-            std::cerr << E("Failed to initialize ImGui DX11.") << std::endl;
-            exit(1);
-        }
-
-    }
-
-    void RenderLoop()
-    {
-        MSG msg;
-        ZeroMemory(&msg, sizeof(MSG));
-        bool running = true;
-        
-
-        while (true)
-        {
-            while (PeekMessageW(&msg, nullptr, 0U, 0U, PM_REMOVE))
-            {
-                TranslateMessage(&msg);
-                DispatchMessageW(&msg);
-
-                if (msg.message == WM_QUIT)
-                    running = false;
-            }
-
-            if (!running) break;
-
-            ImGui_ImplDX11_NewFrame();
-            ImGui_ImplWin32_NewFrame();
-            ImGui::NewFrame();
-
-            // Draw your stuff here
-            drawLoop();
-
-            ImGui::Render();
-
-            constexpr FLOAT clearColor[4]{ 0.0f, 0.0f, 0.0f, 0.0f };
-            deviceContext->OMSetRenderTargets(1U, &renderTargetView, nullptr);
-            deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
-
-            ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-            if (FAILED(swapChain->Present(1U, 0U)))
-            {
-                std::cerr << E("Failed to present swap chain.") << std::endl;
-                exit(1);
-            }
-        }
-    }
-
-    void Cleanup()
-    {
-        ImGui_ImplDX11_Shutdown();
-        ImGui_ImplWin32_Shutdown();
-        ImGui::DestroyContext();
-
-        if (swapChain)        swapChain->Release();
-        if (deviceContext)    deviceContext->Release();
-        if (device)           device->Release();
-        if (renderTargetView) renderTargetView->Release();
-
-        DestroyWindow(window);
-        UnregisterClassW(L"U", hInstance);
-
-        exit(0);
-    }
+		// Handle loss of D3D9 device
+		if (result == D3DERR_DEVICELOST && g_pd3dDevice->TestCooperativeLevel() == D3DERR_DEVICENOTRESET)
+			ResetDevice();
+	}
 
 
-    void fonts() {
-        ImGuiIO& io = ImGui::GetIO();
-        io.Fonts->AddFontDefault();
+	void Destroy()
+	{
+		SPOOF_FUNC;
+		ImGui_ImplDX9_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
 
-        if (!WroteFonts) {
-            saveFont();
-            Sleep(1000);
-            WroteFonts = true;
-        }
+		if (g_pd3dDevice) { g_pd3dDevice->Release(); g_pd3dDevice = nullptr; }
+		if (g_pD3D) { g_pD3D->Release(); g_pD3D = nullptr; }
+		::DestroyWindow(hwnd);
+	}
 
-        TCHAR username[UNLEN + 1];
-        DWORD username_len = UNLEN + 1;
-        if (!GetUserName(username, &username_len)) {
-            return;
-        }
+	bool CreateDeviceD3D(HWND hWnd)
+	{
+		SPOOF_FUNC;
+		if ((g_pD3D = Direct3DCreate9(D3D_SDK_VERSION)) == nullptr)
+			return false;
 
-        std::string ws(username);
-        std::string user_name(ws.begin(), ws.end());
+		// Create the D3DDevice
+		ZeroMemory(&g_d3dpp, sizeof(g_d3dpp));
+		g_d3dpp.Windowed = TRUE;
+		g_d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+		g_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8; // Need to use an explicit format with alpha if needing per-pixel alpha composition.
+		g_d3dpp.EnableAutoDepthStencil = TRUE;
+		g_d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
+		//g_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;           // Present with vsync
+		g_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;   // Present without vsync, maximum unthrottled framerate
+		if (g_pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING, &g_d3dpp, &g_pd3dDevice) < 0)
+			return false;
 
-        std::filesystem::path font1_path = ("C:\\Users\\") + user_name + ("\\AppData\\Local\\Microsoft\\Windows\\Fonts\\Tanseek Modern W20 Medium.ttf");
-        std::filesystem::path font2_path = ("C:\\Users\\") + user_name + ("\\AppData\\Local\\Microsoft\\Windows\\Fonts\\CheatmenuFont-Regular.ttf");
-        std::filesystem::path font3_path = ("C:\\Users\\") + user_name + ("\\AppData\\Local\\Microsoft\\Windows\\Fonts\\Tanseek Modern W20 Medium.ttf");
+		return true;
+	}
 
-        if (std::filesystem::exists(font1_path))
-            io.Fonts->AddFontFromFileTTF(font1_path.string().c_str(), 18.0f);
-        if (std::filesystem::exists(font2_path))
-            io.Fonts->AddFontFromFileTTF(font2_path.string().c_str(), 26.0f);
-        if (std::filesystem::exists(font3_path))
-            io.Fonts->AddFontFromFileTTF(font3_path.string().c_str(), 15.0f);
+	void ResetDevice()
+	{
+		SPOOF_FUNC;
+		ImGui_ImplDX9_InvalidateDeviceObjects();
+		HRESULT hr = g_pd3dDevice->Reset(&g_d3dpp);
+		if (hr == D3DERR_INVALIDCALL)
+			IM_ASSERT(0);
+		ImGui_ImplDX9_CreateDeviceObjects();
+	}
 
-    }
-
-    void Run(HINSTANCE hInstance, INT nCmdShow, void (*drawLoop)())
-    {
-        Overlay::hInstance = hInstance;
-        Overlay::nCmdShow = nCmdShow;
-        Overlay::drawLoop = drawLoop;
-
-        InitializeWindow();
-        InitializeDirectX();
-        InitializeImGui();
-
-        Overlay::fonts();
-
-        RenderLoop();
-        Cleanup();
-    }
 }
 
-#endif // OVERLAY_HPP
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	SPOOF_FUNC;
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+		return true;
+
+	switch (msg)
+	{
+	case WM_SIZE:
+		if (wParam == SIZE_MINIMIZED)
+			return 0;
+		Overlay::g_ResizeWidth = (UINT)LOWORD(lParam); // Queue resize
+		Overlay::g_ResizeHeight = (UINT)HIWORD(lParam);
+		return 0;
+	case WM_SYSCOMMAND:
+		if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
+			return 0;
+		break;
+	case WM_DESTROY:
+		::PostQuitMessage(0);
+		return 0;
+	}
+	return ::DefWindowProcW(hWnd, msg, wParam, lParam);
+}

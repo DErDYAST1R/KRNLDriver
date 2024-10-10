@@ -259,6 +259,7 @@ PVOID ResolveRelativeAddress(
 	return ResolvedAddr;
 }
 
+
 NTSTATUS BBSearchPattern(IN PCUCHAR pattern, IN UCHAR wildcard, IN ULONG_PTR len, IN const VOID* base, IN ULONG_PTR size, OUT PVOID* ppFound, int index = 0)
 {
 	ASSERT(ppFound != NULL && pattern != NULL && base != NULL);

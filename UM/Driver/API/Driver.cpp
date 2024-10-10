@@ -3,31 +3,43 @@
 uintptr_t	_Driver::BaseAddress;
 HANDLE		_Driver::DriverHandle;
 int			_Driver::ProcessID;
-
-void GetCpuID(int cpuInfo[4]) {
-	__cpuid(cpuInfo, 0);
-}
-
-unsigned int CombineCpuInfo(int cpuInfo[4])
-{
-	return (cpuInfo[1] ^ cpuInfo[2] ^ cpuInfo[3] ^ cpuInfo[0]);
-}
-
-void IntegerToString(int value, char* buffer, size_t bufferSize)
-{
-	snprintf(buffer, bufferSize, "%d", value);
-}
+int			_Driver::ClientDLL;
 
 bool _Driver::Init()
 {
-	int cpuInfo[4] = { 0 };
-	GetCpuID(cpuInfo);
-	unsigned int pcpuInfo = (cpuInfo[1] ^ cpuInfo[2] ^ cpuInfo[3] ^ cpuInfo[0]);
-	char buffer[16];
-	IntegerToString(pcpuInfo, buffer, sizeof(buffer));
+	SPOOF_FUNC;
+	int AGEHUGAIUHVAR1 = 1613513513;
+	int AGEHUGAIUHVAR2 = 1357981351;
+	int AGEHUGAIUHVAR3 = 6135413635;
+	int AGEHUGAIUHVAR4 = 1351351515;
+	int AGEHUGAIUHVAR5 = 6135135151;
 
+	while (AGEHUGAIUHVAR1 == 13651351)
+	{
+		AGEHUGAIUHVAR1 += 1;
+	}
 
-	DriverHandle = CreateFileA(E("\\\\.\\\{068f6114-2b67-4886-b404-8051049b9e66}"), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+	while (AGEHUGAIUHVAR2 == 3151351351)
+	{
+		AGEHUGAIUHVAR2 += 1;
+	}
+
+	while (AGEHUGAIUHVAR3 == 136511351135351)
+	{
+		AGEHUGAIUHVAR3 += 1;
+	}
+
+	while (AGEHUGAIUHVAR4 == 13613551351135135)
+	{
+		AGEHUGAIUHVAR4 += 1;
+	}
+
+	while (AGEHUGAIUHVAR5 == 13513515115)
+	{
+		AGEHUGAIUHVAR5 += 1;
+	}
+
+	DriverHandle = CreateFileA(E("\\\\.\\\{1ADA740B-77EF-4C51-AE18-786BBB2038C3}"), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 	if (!DriverHandle || DriverHandle == INVALID_HANDLE_VALUE)
 	{
 		return false;
@@ -75,30 +87,94 @@ bool _Driver::Load(std::vector<std::uint8_t> Bytes)
 
 int _Driver::FindProcessID(std::string ProcessName)
 {
+	SPOOF_FUNC;
+	int AGEHUGAIUHVAR1 = 1613513513;
+	int AGEHUGAIUHVAR2 = 1357981351;
+	int AGEHUGAIUHVAR3 = 6135413635;
+	int AGEHUGAIUHVAR4 = 1351351515;
+	int AGEHUGAIUHVAR5 = 6135135151;
+
+	while (AGEHUGAIUHVAR1 == 13651351)
+	{
+		AGEHUGAIUHVAR1 += 1;
+	}
+
+	while (AGEHUGAIUHVAR2 == 3151351351)
+	{
+		AGEHUGAIUHVAR2 += 1;
+	}
+
+	while (AGEHUGAIUHVAR3 == 136511351135351)
+	{
+		AGEHUGAIUHVAR3 += 1;
+	}
+
+	while (AGEHUGAIUHVAR4 == 13613551351135135)
+	{
+		AGEHUGAIUHVAR4 += 1;
+	}
+
+	while (AGEHUGAIUHVAR5 == 13513515115)
+	{
+		AGEHUGAIUHVAR5 += 1;
+	}
+
 	PROCESSENTRY32 ProcessEntry;
-	HANDLE Handle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	HANDLE Handle = LI_FN(CreateToolhelp32Snapshot)(TH32CS_SNAPPROCESS, 0);
 	ProcessEntry.dwSize = sizeof(PROCESSENTRY32);
 
-	if (Process32First(Handle, &ProcessEntry))
+	if (LI_FN(Process32First)(Handle, &ProcessEntry))
 	{
 		do
 		{
 			if (!LI_FN(lstrcmpiA)(ProcessEntry.szExeFile, ProcessName.c_str()))
 			{
-				CloseHandle(Handle);
+				LI_FN(CloseHandle)(Handle);
 				Handle = nullptr;
 				return ProcessEntry.th32ProcessID;
 			}
-		} while (Process32Next(Handle, &ProcessEntry));
+		} while (LI_FN(Process32Next)(Handle, &ProcessEntry));
 	}
 
-	CloseHandle(Handle);
+	LI_FN(CloseHandle)(Handle);
 	Handle = nullptr;
 	return 0;
 }
 
 void _Driver::ReadProcessMemory(PVOID Destination, PVOID Buffer, DWORD Size)
 {
+	SPOOF_FUNC;
+	int AGEHUGAIUHVAR1 = 1613513513;
+	int AGEHUGAIUHVAR2 = 1357981351;
+	int AGEHUGAIUHVAR3 = 6135413635;
+	int AGEHUGAIUHVAR4 = 1351351515;
+	int AGEHUGAIUHVAR5 = 6135135151;
+
+	while (AGEHUGAIUHVAR1 == 13651351)
+	{
+		AGEHUGAIUHVAR1 += 1;
+	}
+
+	while (AGEHUGAIUHVAR2 == 3151351351)
+	{
+		AGEHUGAIUHVAR2 += 1;
+	}
+
+	while (AGEHUGAIUHVAR3 == 136511351135351)
+	{
+		AGEHUGAIUHVAR3 += 1;
+	}
+
+	while (AGEHUGAIUHVAR4 == 13613551351135135)
+	{
+		AGEHUGAIUHVAR4 += 1;
+	}
+
+	while (AGEHUGAIUHVAR5 == 13513515115)
+	{
+		AGEHUGAIUHVAR5 += 1;
+	}
+
 	SReadWrite Arguments{ NULL };
 
 	Arguments.ProcessID = ProcessID;
@@ -111,6 +187,38 @@ void _Driver::ReadProcessMemory(PVOID Destination, PVOID Buffer, DWORD Size)
 
 void _Driver::WriteProcessMemory(PVOID Destination, PVOID Buffer, DWORD Size)
 {
+	SPOOF_FUNC;
+	int AGEHUGAIUHVAR1 = 1613513513;
+	int AGEHUGAIUHVAR2 = 1357981351;
+	int AGEHUGAIUHVAR3 = 6135413635;
+	int AGEHUGAIUHVAR4 = 1351351515;
+	int AGEHUGAIUHVAR5 = 6135135151;
+
+	while (AGEHUGAIUHVAR1 == 13651351)
+	{
+		AGEHUGAIUHVAR1 += 1;
+	}
+
+	while (AGEHUGAIUHVAR2 == 3151351351)
+	{
+		AGEHUGAIUHVAR2 += 1;
+	}
+
+	while (AGEHUGAIUHVAR3 == 136511351135351)
+	{
+		AGEHUGAIUHVAR3 += 1;
+	}
+
+	while (AGEHUGAIUHVAR4 == 13613551351135135)
+	{
+		AGEHUGAIUHVAR4 += 1;
+	}
+
+	while (AGEHUGAIUHVAR5 == 13513515115)
+	{
+		AGEHUGAIUHVAR5 += 1;
+	}
+
 	SReadWrite Arguments{ NULL };
 
 	Arguments.ProcessID = ProcessID;
@@ -123,11 +231,75 @@ void _Driver::WriteProcessMemory(PVOID Destination, PVOID Buffer, DWORD Size)
 
 void _Driver::ReadProcessArray(PVOID Destination, PVOID Buffer, DWORD Size)
 {
-	_Driver::ReadProcessMemory(Destination, Buffer, Size);
+	SPOOF_FUNC;
+	int AGEHUGAIUHVAR1 = 1613513513;
+	int AGEHUGAIUHVAR2 = 1357981351;
+	int AGEHUGAIUHVAR3 = 6135413635;
+	int AGEHUGAIUHVAR4 = 1351351515;
+	int AGEHUGAIUHVAR5 = 6135135151;
+
+	while (AGEHUGAIUHVAR1 == 13651351)
+	{
+		AGEHUGAIUHVAR1 += 1;
+	}
+
+	while (AGEHUGAIUHVAR2 == 3151351351)
+	{
+		AGEHUGAIUHVAR2 += 1;
+	}
+
+	while (AGEHUGAIUHVAR3 == 136511351135351)
+	{
+		AGEHUGAIUHVAR3 += 1;
+	}
+
+	while (AGEHUGAIUHVAR4 == 13613551351135135)
+	{
+		AGEHUGAIUHVAR4 += 1;
+	}
+
+	while (AGEHUGAIUHVAR5 == 13513515115)
+	{
+		AGEHUGAIUHVAR5 += 1;
+	}
+
+	LI_FN(_Driver::ReadProcessMemory)(Destination, Buffer, Size);
 }
 
 void _Driver::CacheCR3()
 {
+	SPOOF_FUNC;
+	int AGEHUGAIUHVAR1 = 1613513513;
+	int AGEHUGAIUHVAR2 = 1357981351;
+	int AGEHUGAIUHVAR3 = 6135413635;
+	int AGEHUGAIUHVAR4 = 1351351515;
+	int AGEHUGAIUHVAR5 = 6135135151;
+
+	while (AGEHUGAIUHVAR1 == 13651351)
+	{
+		AGEHUGAIUHVAR1 += 1;
+	}
+
+	while (AGEHUGAIUHVAR2 == 3151351351)
+	{
+		AGEHUGAIUHVAR2 += 1;
+	}
+
+	while (AGEHUGAIUHVAR3 == 136511351135351)
+	{
+		AGEHUGAIUHVAR3 += 1;
+	}
+
+	while (AGEHUGAIUHVAR4 == 13613551351135135)
+	{
+		AGEHUGAIUHVAR4 += 1;
+	}
+
+	while (AGEHUGAIUHVAR5 == 13513515115)
+	{
+		AGEHUGAIUHVAR5 += 1;
+	}
+
 	SCR3 Arguments{ NULL };
 
 	Arguments.ProcessID = ProcessID;
@@ -137,6 +309,38 @@ void _Driver::CacheCR3()
 
 uintptr_t _Driver::FindBaseAddress()
 {
+	SPOOF_FUNC;
+	int AGEHUGAIUHVAR1 = 1613513513;
+	int AGEHUGAIUHVAR2 = 1357981351;
+	int AGEHUGAIUHVAR3 = 6135413635;
+	int AGEHUGAIUHVAR4 = 1351351515;
+	int AGEHUGAIUHVAR5 = 6135135151;
+
+	while (AGEHUGAIUHVAR1 == 13651351)
+	{
+		AGEHUGAIUHVAR1 += 1;
+	}
+
+	while (AGEHUGAIUHVAR2 == 3151351351)
+	{
+		AGEHUGAIUHVAR2 += 1;
+	}
+
+	while (AGEHUGAIUHVAR3 == 136511351135351)
+	{
+		AGEHUGAIUHVAR3 += 1;
+	}
+
+	while (AGEHUGAIUHVAR4 == 13613551351135135)
+	{
+		AGEHUGAIUHVAR4 += 1;
+	}
+
+	while (AGEHUGAIUHVAR5 == 13513515115)
+	{
+		AGEHUGAIUHVAR5 += 1;
+	}
+
 	SBaseAddress Arguments{ NULL };
 	uintptr_t Buffer{ NULL };
 
@@ -150,6 +354,38 @@ uintptr_t _Driver::FindBaseAddress()
 
 uintptr_t _Driver::FindModuleAddress(const char* name)
 {
+	SPOOF_FUNC;
+	int AGEHUGAIUHVAR1 = 1613513513;
+	int AGEHUGAIUHVAR2 = 1357981351;
+	int AGEHUGAIUHVAR3 = 6135413635;
+	int AGEHUGAIUHVAR4 = 1351351515;
+	int AGEHUGAIUHVAR5 = 6135135151;
+
+	while (AGEHUGAIUHVAR1 == 13651351)
+	{
+		AGEHUGAIUHVAR1 += 1;
+	}
+
+	while (AGEHUGAIUHVAR2 == 3151351351)
+	{
+		AGEHUGAIUHVAR2 += 1;
+	}
+
+	while (AGEHUGAIUHVAR3 == 136511351135351)
+	{
+		AGEHUGAIUHVAR3 += 1;
+	}
+
+	while (AGEHUGAIUHVAR4 == 13613551351135135)
+	{
+		AGEHUGAIUHVAR4 += 1;
+	}
+
+	while (AGEHUGAIUHVAR5 == 13513515115)
+	{
+		AGEHUGAIUHVAR5 += 1;
+	}
+
 	SModuleAddress Arguments{ NULL };
 	uintptr_t Buffer{ NULL };
 
@@ -164,6 +400,38 @@ uintptr_t _Driver::FindModuleAddress(const char* name)
 
 void _Driver::ElevateProcess(int PID)
 {
+	SPOOF_FUNC;
+	int AGEHUGAIUHVAR1 = 1613513513;
+	int AGEHUGAIUHVAR2 = 1357981351;
+	int AGEHUGAIUHVAR3 = 6135413635;
+	int AGEHUGAIUHVAR4 = 1351351515;
+	int AGEHUGAIUHVAR5 = 6135135151;
+
+	while (AGEHUGAIUHVAR1 == 13651351)
+	{
+		AGEHUGAIUHVAR1 += 1;
+	}
+
+	while (AGEHUGAIUHVAR2 == 3151351351)
+	{
+		AGEHUGAIUHVAR2 += 1;
+	}
+
+	while (AGEHUGAIUHVAR3 == 136511351135351)
+	{
+		AGEHUGAIUHVAR3 += 1;
+	}
+
+	while (AGEHUGAIUHVAR4 == 13613551351135135)
+	{
+		AGEHUGAIUHVAR4 += 1;
+	}
+
+	while (AGEHUGAIUHVAR5 == 13513515115)
+	{
+		AGEHUGAIUHVAR5 += 1;
+	}
+
 	SElevateProcess Arguments{ NULL };
 
 	Arguments.ProcessID = PID;
@@ -173,6 +441,38 @@ void _Driver::ElevateProcess(int PID)
 
 void _Driver::MoveMouse(int X, int Y)
 {
+	SPOOF_FUNC;
+	int AGEHUGAIUHVAR1 = 1613513513;
+	int AGEHUGAIUHVAR2 = 1357981351;
+	int AGEHUGAIUHVAR3 = 6135413635;
+	int AGEHUGAIUHVAR4 = 1351351515;
+	int AGEHUGAIUHVAR5 = 6135135151;
+
+	while (AGEHUGAIUHVAR1 == 13651351)
+	{
+		AGEHUGAIUHVAR1 += 1;
+	}
+
+	while (AGEHUGAIUHVAR2 == 3151351351)
+	{
+		AGEHUGAIUHVAR2 += 1;
+	}
+
+	while (AGEHUGAIUHVAR3 == 136511351135351)
+	{
+		AGEHUGAIUHVAR3 += 1;
+	}
+
+	while (AGEHUGAIUHVAR4 == 13613551351135135)
+	{
+		AGEHUGAIUHVAR4 += 1;
+	}
+
+	while (AGEHUGAIUHVAR5 == 13513515115)
+	{
+		AGEHUGAIUHVAR5 += 1;
+	}
+
 	SMoveMouse Arguments{ NULL };
 
 	Arguments.X = (LONG)X;
@@ -182,6 +482,38 @@ void _Driver::MoveMouse(int X, int Y)
 }
 
 void _Driver::HideProcess(int PID) {
+	SPOOF_FUNC;
+	int AGEHUGAIUHVAR1 = 1613513513;
+	int AGEHUGAIUHVAR2 = 1357981351;
+	int AGEHUGAIUHVAR3 = 6135413635;
+	int AGEHUGAIUHVAR4 = 1351351515;
+	int AGEHUGAIUHVAR5 = 6135135151;
+
+	while (AGEHUGAIUHVAR1 == 13651351)
+	{
+		AGEHUGAIUHVAR1 += 1;
+	}
+
+	while (AGEHUGAIUHVAR2 == 3151351351)
+	{
+		AGEHUGAIUHVAR2 += 1;
+	}
+
+	while (AGEHUGAIUHVAR3 == 136511351135351)
+	{
+		AGEHUGAIUHVAR3 += 1;
+	}
+
+	while (AGEHUGAIUHVAR4 == 13613551351135135)
+	{
+		AGEHUGAIUHVAR4 += 1;
+	}
+
+	while (AGEHUGAIUHVAR5 == 13513515115)
+	{
+		AGEHUGAIUHVAR5 += 1;
+	}
+
 	hidefile Arguments{ NULL };
 	Arguments.process_id = PID;
 	DeviceIoControl(DriverHandle, CodeHideProcess, &Arguments, sizeof(Arguments), nullptr, NULL, NULL, NULL);

@@ -25,7 +25,7 @@
     <ClCompile Include="Lib\imgui\imgui.cpp" />
     <ClCompile Include="Lib\imgui\imgui_demo.cpp" />
     <ClCompile Include="Lib\imgui\imgui_draw.cpp" />
-    <ClCompile Include="Lib\imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="Lib\imgui\imgui_impl_dx9.cpp" />
     <ClCompile Include="Lib\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="Lib\imgui\imgui_tables.cpp" />
     <ClCompile Include="Lib\imgui\imgui_widgets.cpp" />
@@ -33,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bypass.h" />
+    <ClInclude Include="color.hpp" />
     <ClInclude Include="core\camera.hpp" />
     <ClInclude Include="core\offsets.hpp" />
     <ClInclude Include="core\player.hpp" />
@@ -41,6 +42,7 @@
     <ClInclude Include="core\sdk.h" />
     <ClInclude Include="core\structs.h" />
     <ClInclude Include="Driver\API\Driver.h" />
+    <ClInclude Include="Driver\Callstack-Spoofer.h" />
     <ClInclude Include="Driver\Loadup.h" />
     <ClInclude Include="Driver\SCANNER\Scanner.h" />
     <ClInclude Include="Driver\UTILS\lazy_importer.hpp" />
@@ -61,7 +63,7 @@
     <ClInclude Include="Lib\fonts.hpp" />
     <ClInclude Include="Lib\imgui\imconfig.h" />
     <ClInclude Include="Lib\imgui\imgui.h" />
-    <ClInclude Include="Lib\imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="Lib\imgui\imgui_impl_dx9.h" />
     <ClInclude Include="Lib\imgui\imgui_impl_win32.h" />
     <ClInclude Include="Lib\imgui\imgui_internal.h" />
     <ClInclude Include="Lib\imgui\imstb_rectpack.h" />
@@ -71,6 +73,15 @@
     <ClInclude Include="Overlay\draw.hpp" />
     <ClInclude Include="Overlay\drawUtils.hpp" />
     <ClInclude Include="Overlay\window.hpp" />
+    <ClInclude Include="sdk\data\client.dll.h" />
+    <ClInclude Include="sdk\data\engine.dll.h" />
+    <ClInclude Include="sdk\data\offsets.h" />
+    <ClInclude Include="sdk\data\weapon_info.h" />
+    <ClInclude Include="sdk\player.hpp" />
+    <ClInclude Include="sdk\sdk.h" />
+    <ClInclude Include="sdk\vphys\ray_trace.h" />
+    <ClInclude Include="sdk\vphys\vector.h" />
+    <ClInclude Include="sdk\world.hpp" />
     <ClInclude Include="utils\hardware.hpp" />
     <ClInclude Include="utils\lazy_importer.hpp" />
     <ClInclude Include="utils\pimraryXor.h" />
@@ -134,7 +145,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>apex</TargetName>
+    <TargetName>stickynotes</TargetName>
     <IncludePath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(Platform)\$(ConfigurationName)\</OutDir>
@@ -195,7 +206,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>

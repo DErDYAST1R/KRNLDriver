@@ -20,6 +20,8 @@ PWCHAR ToPWCHAR(const std::string& String)
 
 NTSTATUS Bypass::LoadGhidraDriver(const char* DriverPath)
 {
+    SPOOF_FUNC;
+
     PWCHAR GDrvPath = ToPWCHAR(("C:\\Windows\\System32\\Drivers\\gdrv.sys"));
     PWCHAR WideDriverPath = ToPWCHAR(DriverPath);
     return WindLoadDriver(GDrvPath, WideDriverPath, FALSE);
@@ -27,6 +29,8 @@ NTSTATUS Bypass::LoadGhidraDriver(const char* DriverPath)
 
 NTSTATUS Bypass::UnloadGhidraDriver(const char* DriverPath)
 {
+    SPOOF_FUNC;
+
     PWCHAR WideDriverPath = ToPWCHAR(DriverPath);
     return WindUnloadDriver(WideDriverPath, FALSE);
 }

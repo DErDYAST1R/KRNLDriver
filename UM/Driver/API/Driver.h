@@ -65,6 +65,7 @@ public:
 	static uintptr_t	BaseAddress;
 	static HANDLE		DriverHandle;
 	static int			ProcessID;
+	static int			ClientDLL;
 
 
 
@@ -85,6 +86,8 @@ public:
 	template <typename T>
 	inline T RPM(uint64_t address)
 	{
+		SPOOF_FUNC;
+
 		T buffer{ };
 		ReadProcessMemory((PVOID)address, &buffer, sizeof(T));
 		return buffer;
@@ -93,6 +96,8 @@ public:
 	template <typename T>
 	inline T WPM(uint64_t address, T buffer) 
 	{
+		SPOOF_FUNC;
+
 		WriteProcessMemory((PVOID)address, &buffer, sizeof(T));
 		return buffer;
 	}
@@ -100,6 +105,8 @@ public:
 	template <typename T>
 	void readArray(uint64_t address, T* buffer, size_t size)
 	{
+		SPOOF_FUNC;
+
 		ReadProcessMemory((PVOID)address, (PVOID)buffer, (sizeof(T) * size));
 	}
 };

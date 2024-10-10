@@ -78,6 +78,7 @@
     <DriverType>KMDF</DriverType>
     <DriverTargetPlatform>Universal</DriverTargetPlatform>
     <Driver_SpectreMitigation>false</Driver_SpectreMitigation>
+    <ALLOW_DATE_TIME>1</ALLOW_DATE_TIME>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <TargetVersion>Windows10</TargetVersion>
@@ -133,8 +134,8 @@
     <IncludePath>C:\Users\codys\Downloads\ioctl ctrl driver\kernelmode;$(IncludePath)</IncludePath>
     <TimeStampServer>
     </TimeStampServer>
-    <OutDir>$(Platform)\$(ConfigurationName)\</OutDir>
-    <TargetName>Driver</TargetName>
+    <OutDir>$(SolutionDir)$(Platform)\$(ConfigurationName)\</OutDir>
+    <TargetName>KRNL</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>

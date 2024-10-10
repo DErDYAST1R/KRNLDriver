@@ -1,4 +1,5 @@
 #pragma once
+#include <ostream>
 
 /*____________________________________________________________________________________________________________
 
@@ -61,6 +62,7 @@ namespace skc
 	class skCrypter
 	{
 	public:
+
 		__forceinline constexpr skCrypter(T* data)
 		{
 			crypt(data);

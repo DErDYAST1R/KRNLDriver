@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Document Version="2">
+    <Protection InputFileName="stickynotes.exe" Options="365512" VMCodeSectionName=".???">
+        <Messages>
+            <Message Id="0">.</Message>
+            <Message Id="1">.</Message>
+            <Message Id="2">.</Message>
+            <Message Id="3">.</Message>
+            <Message Id="4">.</Message>
+        </Messages>
+        <Folders />
+        <Procedures />
+        <Objects />
+    </Protection>
+    <DLLBox>
+        <Folders />
+    </DLLBox>
+    <Script />
+    <LicenseManager />
+</Document>

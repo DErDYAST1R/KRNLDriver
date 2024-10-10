@@ -1,72 +1,139 @@
 #include "read.h"
 
-
 NTSTATUS Read::read(PVOID target_address, PVOID buffer, SIZE_T size, SIZE_T* bytes_read) {
 	SPOOF_FUNC;
 
+	// Check for null pointers
+	if (!target_address || !buffer || !bytes_read) {
+		return STATUS_INVALID_PARAMETER;
+	}
+
+	// Check for a valid size
+	if (size == 0) {
+		*bytes_read = 0;  // No bytes to read
+		return STATUS_SUCCESS;
+	}
+
 	MM_COPY_ADDRESS to_read = { 0 };
 	to_read.PhysicalAddress.QuadPart = (LONGLONG)target_address;
-	return udman_spoof(MmCopyMemory)(buffer, to_read, size, MM_COPY_MEMORY_PHYSICAL, bytes_read);
+
+	// Call the memory copy function and check its return value
+	NTSTATUS status = udman_spoof(MmCopyMemory)(buffer, to_read, size, MM_COPY_MEMORY_PHYSICAL, bytes_read);
+	if (!NT_SUCCESS(status)) {
+		// Log error for debugging
+		return status;
+	}
+
+	// Ensure bytes_read reflects the actual number of bytes read
+	if (*bytes_read > size) {
+		*bytes_read = size;  // Cap at requested size to prevent overflow
+	}
+
+	return STATUS_SUCCESS;
 }
+
 
 NTSTATUS Read::readVirtual(PVOID target_address, PVOID buffer, SIZE_T size, SIZE_T* bytes_read) {
 	SPOOF_FUNC;
 
+	// Check for null pointers
+	if (!target_address || !buffer || !bytes_read) {
+		return STATUS_INVALID_PARAMETER;
+	}
+
+	// Check for a valid size
+	if (size == 0) {
+		*bytes_read = 0;  // No bytes to read
+		return STATUS_SUCCESS;
+	}
+
 	MM_COPY_ADDRESS to_read = { 0 };
 	to_read.PhysicalAddress.QuadPart = (LONGLONG)target_address;
-	return udman_spoof(MmCopyMemory)(buffer, to_read, size, MM_COPY_MEMORY_PHYSICAL, bytes_read);
+
+	// Call the memory copy function and check its return value
+	NTSTATUS status = udman_spoof(MmCopyMemory)(buffer, to_read, size, MM_COPY_MEMORY_PHYSICAL, bytes_read);
+	if (!NT_SUCCESS(status)) {
+		// Log error for debugging
+		return status;
+	}
+
+	// Ensure bytes_read reflects the actual number of bytes read
+	if (*bytes_read > size) {
+		*bytes_read = size;  // Cap at requested size to prevent overflow
+	}
+
+	return STATUS_SUCCESS;
 }
 
-NTSTATUS Read2(PVOID target_address, PVOID buffer, SIZE_T size, SIZE_T* bytes_read)
-{
+
+NTSTATUS Read2(PVOID target_address, PVOID buffer, SIZE_T size, SIZE_T* bytes_read) {
 	SPOOF_FUNC;
 
-	if (!target_address)
-		return STATUS_UNSUCCESSFUL;
+	// Check for null pointers
+	if (!target_address || !buffer || !bytes_read) {
+		return STATUS_INVALID_PARAMETER;
+	}
 
 	PHYSICAL_ADDRESS AddrToWrite = { 0 };
 	AddrToWrite.QuadPart = LONGLONG(target_address);
 
+	// Map the memory
 	PVOID pmapped_mem = udman_spoof(MmMapIoSpaceEx)(AddrToWrite, size, PAGE_READWRITE);
-
-	if (!pmapped_mem)
+	if (!pmapped_mem) {
 		return STATUS_UNSUCCESSFUL;
+	}
 
-	Helper::custom_Memcpy(buffer, pmapped_mem, size);
+	// Ensure size does not exceed buffer limits
+	SIZE_T bytes_to_copy = min(size, PAGE_SIZE);  // Adjust based on the maximum you can read
+	if (bytes_to_copy > size) {
+		bytes_to_copy = size;
+	}
 
-	*bytes_read = size;
-	udman_spoof(MmUnmapIoSpace)(pmapped_mem, size);
+	// Use custom memcpy with size check
+	Helper::custom_Memcpy(buffer, pmapped_mem, bytes_to_copy);
+
+	*bytes_read = bytes_to_copy;  // Return actual bytes read
+	udman_spoof(MmUnmapIoSpace)(pmapped_mem, size);  // Unmap the memory
+
 	return STATUS_SUCCESS;
 }
 
-
-NTSTATUS Read::ReadMemory(ReadStruct x) 
-{
+NTSTATUS Read::ReadMemory(ReadStruct x) {
 	SPOOF_FUNC;
-	if (!x->process_id)
-		return STATUS_UNSUCCESSFUL;
 
-	if (!struc::SavedCr3)
-		return STATUS_UNSUCCESSFUL;
+	// Check for null or invalid process ID
+	if (!x || !x->process_id || !struc::SavedCr3) {
+		return STATUS_INVALID_PARAMETER;
+	}
 
-	SIZE_T this_offset = NULL;
+	SIZE_T this_offset = 0;
 	SIZE_T total_size = x->size;
 
+	// Translate the linear address and check validity
 	INT64 physical_address = Helper::translate_linear(struc::SavedCr3, (ULONG64)x->address + this_offset);
-	if (!physical_address)
-		return STATUS_UNSUCCESSFUL;
+	if (physical_address <= 0) {
+		return STATUS_UNSUCCESSFUL;  // Handle invalid address
+	}
 
+	// Calculate the final size to read
 	ULONG64 final_size = Helper::find_min(PAGE_SIZE - (physical_address & 0xFFF), total_size);
-	SIZE_T bytes_trough = NULL;
+	if (final_size == 0) {
+		return STATUS_UNSUCCESSFUL;  // No valid size to read
+	}
 
-	Read2(PVOID(physical_address), (PVOID)((ULONG64)x->buffer + this_offset), final_size, &bytes_trough);
+	// Call Read2 and check for success
+	SIZE_T bytes_trough = 0;
+	NTSTATUS status = Read2(PVOID(physical_address), (PVOID)((ULONG64)x->buffer + this_offset), final_size, &bytes_trough);
+	if (!NT_SUCCESS(status)) {
+		return status;  // Propagate error status
+	}
 
 	return STATUS_SUCCESS;
 }
-
 
 NTSTATUS Read::ReadMemoryVirtual(ReadStruct x) 
 {
+	// Function not used...
 	SPOOF_FUNC;
 	if (!x->process_id)
 		return STATUS_UNSUCCESSFUL;
