@@ -145,7 +145,7 @@ void fonts() {
 	std::filesystem::path font3_path = ("C:\\Users\\") + user_name + ("\\AppData\\Local\\Microsoft\\Windows\\Fonts\\Tanseek Modern W20 Medium.ttf");
 
 	if (std::filesystem::exists(font1_path))
-		io.Fonts->AddFontFromFileTTF(font1_path.string().c_str(), 18.0f);
+		io.Fonts->AddFontFromFileTTF(font1_path.string().c_str(), 14.0f);
 	if (std::filesystem::exists(font2_path))
 		io.Fonts->AddFontFromFileTTF(font2_path.string().c_str(), 26.0f);
 	if (std::filesystem::exists(font3_path))

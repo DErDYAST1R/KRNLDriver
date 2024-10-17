@@ -9,6 +9,8 @@
 #define INRANGE(x,a,b)		(x >= a && x <= b) 
 #define getBits( x )		(INRANGE(x,'0','9') ? (x - '0') : ((x&(~0x20)) - 'A' + 0xa))
 #define get_byte( x )		(getBits(x[0]) << 4 | getBits(x[1]))
+#define min(a,b)            (((a) < (b)) ? (a) : (b))
+#define max(a,b)            (((a) > (b)) ? (a) : (b))
 
 template <typename Ty>
 std::vector<Ty> bytes_to_vec(const std::string& bytes)

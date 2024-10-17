@@ -205,22 +205,22 @@ void DriverUnload(PDRIVER_OBJECT drv_obj)
 void CleanDriverSys(UNICODE_STRING driver_int, ULONG timeDateStamp) {
 	SPOOF_FUNC;
 	if (clearCache(driver_int, timeDateStamp) == 0) {
-		DbgPrint("[KRNL] PiDDB Cache Cleared");
+		//DbgPrint(E("[KRNL] PiDDB Cache Cleared"));
 	}
 	else {
-		DbgPrint("[KRNL] PiDDB Cache Failed");
+		//DbgPrint(E("[KRNL] PiDDB Cache Failed"));
 	}
 	if (clearHashBucket(driver_int) == 0) {
-		DbgPrint("[KRNL] HashBucket Cache Cleared");
+		//DbgPrint(E("[KRNL] HashBucket Cache Cleared"));
 	}
 	else {
-		DbgPrint("[KRNL] HashBucket Cache Failed");
+		//DbgPrint(E("[KRNL] HashBucket Cache Failed"));
 	}
 	if (CleanMmu(driver_int) == 0) {
-		DbgPrint("[KRNL] MMU / MML Cache Cleared");
+		//DbgPrint(E("[KRNL] MMU / MML Cache Cleared"));
 	}
 	else {
-		DbgPrint("[KRNL] MMU / MML Cache Failed");
+		//DbgPrint(E("[KRNL] MMU / MML Cache Failed"));
 	}
 }
 
@@ -328,7 +328,7 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath) 
 	PreventNMIExecution();
 	ULONG RandomTime1 = RandomNumberInRange(1561795696, 1698136146); /* 1 */
 	ULONG RandomTime2 = RandomNumberInRange(1561795696, 1698136146); /* 2 */
-	CleanDriverSys(UNICODE_STRING(RTL_CONSTANT_STRING(L"KRNL.sys")), RandomTime1); // Clean Current Driver
+	CleanDriverSys(UNICODE_STRING(RTL_CONSTANT_STRING(L"Impl32.sys")), RandomTime1); // Clean Current Driver
 	CleanDriverSys(UNICODE_STRING(RTL_CONSTANT_STRING(L"gdrv.sys")), RandomTime2); // Clean Vulnerable Driver (Used To Map - Gdrv.sys [time of signing 51D480EB/1372881131/2013 8:32:11 PM]
 
 	if (!struc::ntos_image_base)

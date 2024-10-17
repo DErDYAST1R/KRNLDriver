@@ -77,21 +77,38 @@ extern "C" void Present(IDXGISwapChain* SwapChain) {
 void DllThread() {
 	SPOOF_FUNC;
 	while (TRUE) {
-		Driver->BaseAddress = Driver->FindBaseAddress();
-		if (Driver->BaseAddress == NULL) {
-			Driver->ProcessID = Driver->FindProcessID("cs2.exe");
-			if (Driver->ProcessID != NULL) {
-				Sleep(2000);
-				Driver->CacheCR3();
-				Sleep(500);
-				Driver->BaseAddress = Driver->FindBaseAddress();
-				Sleep(200);
-				Driver->ClientDLL = Driver->FindModuleAddress("client.dll");
-				Sleep(100);
+		try {
+			int PIDr = Driver->FindProcessID(xorstr_("cs2.exe"));
+			if (PIDr != Driver->ProcessID || Driver->ProcessID == NULL || PIDr == NULL) {
+				Driver->BaseAddress = NULL;
+				Driver->ClientDLL = NULL;
+				Driver->ProcessID = NULL;
+
+				if (PIDr != NULL) {
+					Sleep(20000);
+					Driver->ProcessID = PIDr;
+					Driver->CacheCR3();
+					Sleep(200);
+					uintptr_t Base = Driver->FindBaseAddress();
+					Sleep(200);
+					uintptr_t Client = Driver->FindModuleAddress(xorstr_("client.dll"));
+					Sleep(200);
+
+					if (Base != NULL && Client != NULL && PIDr != NULL) {
+						Driver->ProcessID = PIDr;
+						Driver->BaseAddress = Base;
+						Driver->ClientDLL = Client;
+					}
+				}
 			}
-			Sleep(1500);
 		}
-		Sleep(2500);
+		catch (const std::exception& e) {
+			std::cout << e.what() << std::endl;
+			Sleep(5000);
+		}
+		catch (...) {
+			Sleep(5000);
+		}
 	}
 }
 
@@ -107,6 +124,7 @@ BOOL InitDwm() {
 		std::thread q(DllThread); q.detach();
 		DllThreadRunning = TRUE;
 	}
+
 	auto d2d1 = (UINT64)GetModuleHandleA("d2d1.dll");
 
 	auto DrawingContext = FindPatternImage(d2d1, "\x48\x8D\x05\x00\x00\x00\x00\x33\xED\x48\x8D\x71\x08", "xxx????xxxxxx");

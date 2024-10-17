@@ -156,19 +156,6 @@ NTSTATUS Handler::io_controller(PDEVICE_OBJECT device_obj, PIRP irp) {
 			bytes = 0;
 		}
 		break;
-	case code_read_virtual:
-		if (size == sizeof(_rw)) {
-			ReadStruct req = (ReadStruct)(irp->AssociatedIrp.SystemBuffer);
-
-			status = Read::ReadMemoryVirtual(req);
-			bytes = sizeof(_r);
-		}
-		else
-		{
-			status = STATUS_INFO_LENGTH_MISMATCH;
-			bytes = 0;
-		}
-		break;
 	case code_write:
 		if (size == sizeof(_rw)) {
 			WriteStruct req = (WriteStruct)(irp->AssociatedIrp.SystemBuffer);
@@ -183,6 +170,7 @@ NTSTATUS Handler::io_controller(PDEVICE_OBJECT device_obj, PIRP irp) {
 		}
 		break;
 	case code_hide_process:
+		/*
 		if (size == sizeof(_hf)) {
 			HideFileStruct req = (HideFileStruct)(irp->AssociatedIrp.SystemBuffer);
 
@@ -194,6 +182,7 @@ NTSTATUS Handler::io_controller(PDEVICE_OBJECT device_obj, PIRP irp) {
 			status = STATUS_INFO_LENGTH_MISMATCH;
 			bytes = 0;
 		}
+		*/
 		break;
 	case code_get_module_address:
 		if (size == sizeof(_ma)) {

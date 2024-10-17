@@ -71,12 +71,16 @@
     <ClInclude Include="Lib\imgui\imstb_textedit.h" />
     <ClInclude Include="Lib\imgui\imstb_truetype.h" />
     <ClInclude Include="Lib\json.hpp" />
+    <ClInclude Include="Overlay\Render\cfg.h" />
     <ClInclude Include="Overlay\Render\draw.hpp" />
     <ClInclude Include="Overlay\Render\drawUtils.hpp" />
+    <ClInclude Include="Overlay\Render\framework.hpp" />
+    <ClInclude Include="Overlay\Render\framework\cfg.h" />
+    <ClInclude Include="Overlay\Render\framework\framework.hpp" />
     <ClInclude Include="Overlay\window.hpp" />
-    <ClInclude Include="sdk\data\client.dll.h" />
-    <ClInclude Include="sdk\data\engine.dll.h" />
-    <ClInclude Include="sdk\data\offsets.h" />
+    <ClInclude Include="sdk\data\client_dll.hpp" />
+    <ClInclude Include="sdk\data\engine2_dll.hpp" />
+    <ClInclude Include="sdk\data\offsets.hpp" />
     <ClInclude Include="sdk\data\weapon_info.h" />
     <ClInclude Include="sdk\player.hpp" />
     <ClInclude Include="sdk\sdk.h" />
@@ -99,7 +103,7 @@
     <ProjectGuid>{4DA2F4C9-1826-468B-B8D8-442893A9DE73}</ProjectGuid>
     <RootNamespace>dayzNew</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>2_USERMODE_LOADER</ProjectName>
+    <ProjectName>2_USERMODE_EXE</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

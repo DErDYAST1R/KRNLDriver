@@ -182,6 +182,10 @@ void _Driver::ReadProcessMemory(PVOID Destination, PVOID Buffer, DWORD Size)
 	Arguments.Buffer	= (uintptr_t)Buffer;
 	Arguments.Size		= Size;
 
+	if (Driver->BaseAddress == NULL) {
+		return;
+	}
+
 	DeviceIoControl(DriverHandle, CodeRead, &Arguments, sizeof(Arguments), nullptr, NULL, NULL, NULL);
 }
 
@@ -226,6 +230,10 @@ void _Driver::WriteProcessMemory(PVOID Destination, PVOID Buffer, DWORD Size)
 	Arguments.Buffer	= (uintptr_t)Buffer;
 	Arguments.Size		= Size;
 
+	if (Driver->BaseAddress == NULL) {
+		return;
+	}
+
 	DeviceIoControl(DriverHandle, CodeWrite, &Arguments, sizeof(Arguments), nullptr, NULL, NULL, NULL);
 }
 
@@ -261,6 +269,10 @@ void _Driver::ReadProcessArray(PVOID Destination, PVOID Buffer, DWORD Size)
 	while (AGEHUGAIUHVAR5 == 13513515115)
 	{
 		AGEHUGAIUHVAR5 += 1;
+	}
+
+	if (Driver->BaseAddress == NULL) {
+		return;
 	}
 
 	LI_FN(_Driver::ReadProcessMemory)(Destination, Buffer, Size);

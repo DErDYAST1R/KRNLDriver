@@ -11,7 +11,5 @@
 namespace Read
 {
 	NTSTATUS ReadMemory(ReadStruct x);
-	NTSTATUS ReadMemoryVirtual(ReadStruct x);
 	NTSTATUS read(PVOID target_address, PVOID buffer, SIZE_T size, SIZE_T* bytes_read);
-	NTSTATUS readVirtual(PVOID target_address, PVOID buffer, SIZE_T size, SIZE_T* bytes_read);
 }

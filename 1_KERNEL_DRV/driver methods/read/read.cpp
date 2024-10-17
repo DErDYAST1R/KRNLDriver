@@ -33,39 +33,6 @@ NTSTATUS Read::read(PVOID target_address, PVOID buffer, SIZE_T size, SIZE_T* byt
 }
 
 
-NTSTATUS Read::readVirtual(PVOID target_address, PVOID buffer, SIZE_T size, SIZE_T* bytes_read) {
-	SPOOF_FUNC;
-
-	// Check for null pointers
-	if (!target_address || !buffer || !bytes_read) {
-		return STATUS_INVALID_PARAMETER;
-	}
-
-	// Check for a valid size
-	if (size == 0) {
-		*bytes_read = 0;  // No bytes to read
-		return STATUS_SUCCESS;
-	}
-
-	MM_COPY_ADDRESS to_read = { 0 };
-	to_read.PhysicalAddress.QuadPart = (LONGLONG)target_address;
-
-	// Call the memory copy function and check its return value
-	NTSTATUS status = udman_spoof(MmCopyMemory)(buffer, to_read, size, MM_COPY_MEMORY_PHYSICAL, bytes_read);
-	if (!NT_SUCCESS(status)) {
-		// Log error for debugging
-		return status;
-	}
-
-	// Ensure bytes_read reflects the actual number of bytes read
-	if (*bytes_read > size) {
-		*bytes_read = size;  // Cap at requested size to prevent overflow
-	}
-
-	return STATUS_SUCCESS;
-}
-
-
 NTSTATUS Read2(PVOID target_address, PVOID buffer, SIZE_T size, SIZE_T* bytes_read) {
 	SPOOF_FUNC;
 
@@ -127,31 +94,6 @@ NTSTATUS Read::ReadMemory(ReadStruct x) {
 	if (!NT_SUCCESS(status)) {
 		return status;  // Propagate error status
 	}
-
-	return STATUS_SUCCESS;
-}
-
-NTSTATUS Read::ReadMemoryVirtual(ReadStruct x) 
-{
-	// Function not used...
-	SPOOF_FUNC;
-	if (!x->process_id)
-		return STATUS_UNSUCCESSFUL;
-
-	if (!struc::SavedCr3)
-		return STATUS_UNSUCCESSFUL;
-
-	SIZE_T this_offset = NULL;
-	SIZE_T total_size = x->size;
-
-	INT64 physical_address = Helper::translate_linear(struc::SavedCr3, (ULONG64)x->address + this_offset);
-	if (!physical_address)
-		return STATUS_UNSUCCESSFUL;
-
-	ULONG64 final_size = Helper::find_min(PAGE_SIZE - (physical_address & 0xFFF), total_size);
-	SIZE_T bytes_trough = NULL;
-
-	Read2(PVOID(physical_address), (PVOID)((ULONG64)x->buffer + this_offset), final_size, &bytes_trough);
 
 	return STATUS_SUCCESS;
 }

@@ -148,15 +148,14 @@ INT APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT nCmdShow)
 	BOOL DriverHandle = Driver->Init();
 	if (DriverHandle) {
 		Bypass::UnloadGhidraDriver(E(driverLocation));
-		std::cout << dye::grey(" [+] ") << dye::red("Restart Application...");
-		Sleep(1000);
-		exit(1);
+		Sleep(500);
+		Bypass::LoadGhidraDriver(E(driverLocation));
+		DriverHandle = Driver->Init();
 	}
 	if (!DriverHandle) {
 		Bypass::LoadGhidraDriver(E(driverLocation));
 		DriverHandle = Driver->Init();
 	}
-	std::system("cls");
 	
 	std::cout << dye::grey(" [+] ") << dye::light_yellow(waitingForProcessMessage);
 	Driver->ProcessID = Driver->FindProcessID(xorstr_(executableName));
@@ -164,9 +163,9 @@ INT APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT nCmdShow)
 		Sleep(2000);
 		Driver->ProcessID = Driver->FindProcessID(xorstr_(executableName));
 	}
-	LI_FN(ShowWindow)(GetConsoleWindow(), SW_HIDE);
+	// LI_FN(ShowWindow)(GetConsoleWindow(), SW_HIDE);
 	std::cout << dye::grey(" [+] ") << dye::green(foundProcessMessage);
-	Sleep(5000);
+	Sleep(2000);
 	Driver->CacheCR3();
 	uintptr_t BaseAddress = Driver->FindBaseAddress();
 	Driver->BaseAddress = BaseAddress;
@@ -189,6 +188,7 @@ INT APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT nCmdShow)
 		OWHND = LI_FN(FindWindowA)(E("OOPO_WINDOWS_CLASS"), E("ow overlay"));
 	}
 
+	Driver->ClientDLL = Driver->FindModuleAddress("client.dll");
 	Overlay overlay(OWHND);
 	if (!overlay.MessageLoop(drawLoop)) {
 		std::cout << dye::grey(" [+] ") << dye::red(failedToHookOverlayMessage);

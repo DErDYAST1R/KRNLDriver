@@ -8,6 +8,12 @@ bool containsString(const std::string& str, const std::string& find) {
     return str.find(find) != std::string::npos;
 }
 
+char* intToHex(int value) {
+    static char buffer[16]; // 8 hex digits + null terminator for 32-bit int
+    snprintf(buffer, sizeof(buffer), "%08X", value); // Convert to hex
+    return buffer;
+}
+
 ImVec4 Lerp(const ImVec4& a, const ImVec4& b, float t) {
     return ImVec4(
         a.x + (b.x - a.x) * t,
@@ -40,24 +46,36 @@ ImColor Float4ToImColor(const float in[4]) {
     return ImColor(r, g, b, a);
 }
 
+
+
 namespace overlay {
-    bool DrawBox2D(ImDrawList* drawList, ImVec2 startPos, ImVec2 endPos, ImColor outlineColor) {
+    bool DrawBox2D(ImDrawList* drawList, ImVec2 startPos, ImVec2 endPos, ImColor outlineColor, float rounding, int thickness = 1) {
         if (!drawList)
             return false;
 
-        drawList->AddRect(startPos, endPos, outlineColor);
+        float radius = (endPos.x - startPos.x) * rounding * 0.5f; // Calculate radius based on rounding
+        drawList->AddRect(startPos, endPos, ImColor(0, 0, 0, 255), radius, ImDrawFlags_None, thickness);
+        drawList->AddRect(startPos, endPos, outlineColor, radius, ImDrawFlags_None, thickness);
         return true;
-
     }
-    bool DrawFilledBox2D(ImDrawList* drawList, ImVec2 startPos, ImVec2 endPos, ImColor outlineColor, ImColor fillColor) {
+
+    bool DrawFilledBox2D(ImDrawList* drawList, ImVec2 startPos, ImVec2 endPos, ImColor outlineColor, ImColor fillColor, float rounding, int thickness = 1) {
         if (!drawList)
             return false;
 
-        drawList->AddRectFilled(startPos, endPos, fillColor);
-        drawList->AddRect(startPos, endPos, outlineColor);
+        fillColor.Value.w = 0.3f;
+
+        float radius = (endPos.x - startPos.x) * rounding * 0.5f;
+
+
+        drawList->AddRectFilled(startPos, endPos, fillColor, radius);
+        drawList->AddRect(startPos, endPos, ImColor(0, 0, 0, 255), radius, ImDrawFlags_None, thickness);
+        drawList->AddRect(startPos, endPos, outlineColor, radius, ImDrawFlags_None, thickness);
+
         return true;
     }
-    bool DrawGradientBox2D(ImDrawList* drawList, ImVec2 startPos, ImVec2 endPos, ImColor TopColor, ImColor BottomColor, ImColor outlineColor) {
+
+    bool DrawGradientBox2D(ImDrawList* drawList, ImVec2 startPos, ImVec2 endPos, ImColor TopColor, ImColor BottomColor, ImColor outlineColor, float rounding, int thickness = 1) {
         if (!drawList)
             return false;
 
@@ -79,9 +97,10 @@ namespace overlay {
             drawList->AddRectFilled(lineStart, lineEnd, currentColor);
         }
 
-        drawList->AddRect(startPos, endPos, outlineColor);
+        drawList->AddRect(startPos, endPos, outlineColor, 0.0f, thickness);
         return true;
     }
+
 
     bool DrawText2D(ImDrawList* drawList, ImVec2 pos, float size, ImColor textcolor, const char* text) {
         if (drawList == nullptr || text == nullptr) {
@@ -115,10 +134,13 @@ namespace overlay {
         return true;
     }
 
-    bool DrawLine2D(ImDrawList* drawList, ImVec2 starting_point, ImVec2 end_point, ImColor color, float thickness) {
+    bool DrawLine2D(ImDrawList* drawList, ImVec2 starting_point, ImVec2 end_point, ImColor color, float thickness, bool outline = FALSE) {
         if (!drawList)
             return false;
 
+        if (outline == TRUE) {
+            drawList->AddLine(starting_point, end_point, ImColor(0, 0, 0, 255), thickness + 0.2f);
+        }
         drawList->AddLine(starting_point, end_point, color, thickness);
 
         return true;
@@ -143,32 +165,39 @@ namespace overlay {
         return true;
     }
 
-    bool DrawFillBar2D(ImDrawList* drawList, ImVec2 StartPos, ImVec2 EndPos, ImColor FillColor, ImColor EmptyColor, ImColor OutlineColor, float HowFull) {
-        if (!drawList)
-            return false;
 
-        // Clamp HowFull to [0.0, 1.0]
-        if (HowFull < 0.0f) HowFull = 0.0f;
-        if (HowFull > 1.0f) HowFull = 1.0f;
-
-        float width = EndPos.x - StartPos.x;
-        float height = EndPos.y - StartPos.y;
-        float fillWidth = width * HowFull;
-        float fillHeight = height * HowFull;
-
-        // Draw filled and empty portions
-        if (width > height) {
-            drawList->AddRectFilled(ImVec2(StartPos.x, StartPos.y), ImVec2(StartPos.x + fillWidth, EndPos.y), FillColor);
-            drawList->AddRectFilled(ImVec2(StartPos.x + fillWidth, StartPos.y), EndPos, EmptyColor);
+    bool DrawFillBar2D(ImDrawList* drawList, ImVec2 startPos, ImVec2 endPos, ImColor fillColor, ImColor emptyColor, ImColor outlineColor, float howFull, int thickness = 1) {
+        // Clamp howFull between 0.0 and 1.0
+        if (howFull < 0.0f) {
+            howFull = 0.0f;
         }
-        else {
-            drawList->AddRectFilled(ImVec2(StartPos.x, StartPos.y), ImVec2(EndPos.x, StartPos.y + fillHeight), FillColor);
-            drawList->AddRectFilled(ImVec2(StartPos.x, StartPos.y + fillHeight), EndPos, EmptyColor);
+        else if (howFull > 1.0f) {
+            howFull = 1.0f;
         }
 
-        // Draw outline
-        drawList->AddRect(StartPos, EndPos, OutlineColor);
+        // Calculate the width and height of the FillBar
+        float width = endPos.x - startPos.x;
+        float height = endPos.y - startPos.y;
+
+        // Draw the outline of the FillBar
+        //drawList->AddRect(startPos, endPos, outlineColor, 0.0f, ImDrawFlags_None, 1.0f);
+
+        // Calculate the filled area based on howFull
+        ImVec2 fillEndPos = ImVec2(endPos.x, startPos.y + (height * (1.0f - howFull))); // Fill from top to bottom
+
+        float radius = (endPos.x - startPos.x) * 0.7f * 0.5f; // Calculate radius based on rounding
+
+
+        // Draw the filled area
+        drawList->AddRectFilled(ImVec2(startPos.x, fillEndPos.y), endPos, fillColor); // Draw filled area from fillEndPos to bottom
+
+        // Draw the empty area
+        // drawList->AddRect(startPos, endPos, ImColor(0, 0, 0, 255), 0.0f, ImDrawFlags_None, 0.3);
+        drawList->AddRectFilled(startPos, ImVec2(fillEndPos.x, fillEndPos.y), emptyColor); // Draw empty area above filled area
+
+        drawList->AddRect(startPos, endPos, ImColor(0, 0, 0, 255), radius, ImDrawFlags_None, 0.1);
 
         return true;
     }
+
 }

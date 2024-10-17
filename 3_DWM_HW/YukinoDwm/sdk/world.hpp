@@ -1,5 +1,4 @@
-﻿// мф...
-#include "../Driver/API/Driver.h"
+﻿#include "../Driver/API/Driver.h"
 #include "../utils/pimraryXor.h"
 #include <stdio.h>
 #include "../utils/vector.h"
@@ -44,6 +43,13 @@ public:
 		x += 0.5f * out.x * ww + 0.5f;
 		y -= 0.5f * out.y * wh + 0.5f;
 
+		if (x <= 0 or x >= 1920) {
+			return false;
+		}
+		if (y <= 0 or y >= 1080) {
+			return false;
+		}
+
 		out.x = x;
 		out.y = y;
 
@@ -63,7 +69,7 @@ public:
 
 	std::string GetMapName() {
 		uintptr_t global_vars = Driver->RPM<uintptr_t>(this->modBase + offsets::client_dll::dwGlobalVars);
-		uintptr_t current_map_name = Driver->RPM<uintptr_t>(global_vars + 0x01B8);
+		uintptr_t current_map_name = Driver->RPM<uintptr_t>(global_vars + 0x180);
 		char buf[MAX_PATH];
 		Driver->readArray(current_map_name, buf, MAX_PATH);
 		return std::string(buf);
