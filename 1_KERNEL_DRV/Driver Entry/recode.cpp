@@ -259,73 +259,12 @@ QWORD PswResolveRelativeAddress(
 	return ResolvedAddr;
 }
 
-void PreventNMIExecution() {
-	SPOOF_FUNC;
-	int AGEHUGAIUHVAR1 = 1613513513;
-	int AGEHUGAIUHVAR2 = 1357981351;
-	int AGEHUGAIUHVAR3 = 6135413635;
-	int AGEHUGAIUHVAR4 = 1351351515;
-	int AGEHUGAIUHVAR5 = 6135135151;
-
-	while (AGEHUGAIUHVAR1 == 13651351)
-	{
-		AGEHUGAIUHVAR1 += 1;
-	}
-
-	while (AGEHUGAIUHVAR2 == 3151351351)
-	{
-		AGEHUGAIUHVAR2 += 1;
-	}
-
-	while (AGEHUGAIUHVAR3 == 136511351135351)
-	{
-		AGEHUGAIUHVAR3 += 1;
-	}
-
-	while (AGEHUGAIUHVAR4 == 13613551351135135)
-	{
-		AGEHUGAIUHVAR4 += 1;
-	}
-
-	while (AGEHUGAIUHVAR5 == 13513515115)
-	{
-		AGEHUGAIUHVAR5 += 1;
-	}
-	void* ntoskrnl_base = reinterpret_cast<void*>((uintptr_t)get_ntos_base_address());
-	if (ntoskrnl_base == NULL) {
-		DbgPrint("[NMI] Failed to get ntoskrnl_base");
-	}
-
-	// Perform the pattern scanning to locate nmi_in_progress
-	char* pattern = _("\xE8\x00\x00\x00\x00\x83\xCB\xFF\x48\x8B\xD6");
-	char* mask = _("x????xxxxxx");
-
-	char* NtoskrnlStr = _("ntoskrnl.exe");
-
-	void* ModuleSig = static_cast<void*>(FindPatternImage((PCHAR)GetKernelModuleBase(NtoskrnlStr), pattern, mask));
-	QWORD pattern_idt = reinterpret_cast<QWORD>(ModuleSig);
-	// DbgPrint("[NMI] ModuleSig = %p\n", ModuleSig);
-	// DbgPrint("[NMI] patternIDT = %p\n", pattern_idt);
-
-	if (pattern_idt != NULL)
-	{
-		pattern_idt = PswResolveRelativeAddress(pattern_idt, 1, 5);
-		pattern_idt = pattern_idt + 0x1a;
-		pattern_idt = PswResolveRelativeAddress(pattern_idt, 3, 7);
-
-		*(QWORD*)(pattern_idt + 0x38) = *(QWORD*)(pattern_idt + 0x1A0);
-		*(QWORD*)(pattern_idt + 0x40) = *(QWORD*)(pattern_idt + 0x1A8);
-		// DbgPrint(_("[NMI] IDT Patched / NMIs Blocked"));
-	}
-}
-
 
 NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath) {
 	SPOOF_FUNC;
 	UNREFERENCED_PARAMETER(DriverObject);
 	UNREFERENCED_PARAMETER(RegistryPath);
 
-	PreventNMIExecution();
 	ULONG RandomTime1 = RandomNumberInRange(1561795696, 1698136146); /* 1 */
 	ULONG RandomTime2 = RandomNumberInRange(1561795696, 1698136146); /* 2 */
 	CleanDriverSys(UNICODE_STRING(RTL_CONSTANT_STRING(L"Impl32.sys")), RandomTime1); // Clean Current Driver
@@ -343,12 +282,12 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath) 
 	dos_device = concatenate_strings(E(L"\\DosDevices\\"), DEVICE_MODULE);
 
 	status = IoCreateDevice(DriverObject, 0, &device, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &device_obj);
-
+	
 	if (!NT_SUCCESS(status))
 		return status;
 
 	status = IoCreateSymbolicLink(&dos_device, &device);
-
+	
 	if (!NT_SUCCESS(status))
 		return status;
 
@@ -361,6 +300,8 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath) 
 	DriverObject->MajorFunction[IRP_MJ_CLOSE] = &dispatch_handler;
 	DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = &Handler::io_controller;
 	DriverObject->DriverUnload = DriverUnload;
+
+	
 
 	device_obj->Flags &= ~DO_DEVICE_INITIALIZING;
 

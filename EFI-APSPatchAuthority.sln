@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3_USERMODE_DWM_DLL", "3_DWM
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FPM", "FPM\FPM.vcxproj", "{F0BC877B-3873-4D4F-A243-E282B28959D8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xLoader", "gD\gdrv-loader.vcxproj", "{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -95,6 +97,22 @@ Global
 		{F0BC877B-3873-4D4F-A243-E282B28959D8}.Release|x64.Build.0 = Release|x64
 		{F0BC877B-3873-4D4F-A243-E282B28959D8}.Release|x86.ActiveCfg = Release|Win32
 		{F0BC877B-3873-4D4F-A243-E282B28959D8}.Release|x86.Build.0 = Release|Win32
+		{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}.Debug|ARM.ActiveCfg = Debug|x64
+		{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}.Debug|ARM.Build.0 = Debug|x64
+		{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}.Debug|ARM64.ActiveCfg = Debug|x64
+		{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}.Debug|ARM64.Build.0 = Debug|x64
+		{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}.Debug|x64.ActiveCfg = Debug|x64
+		{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}.Debug|x64.Build.0 = Debug|x64
+		{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}.Debug|x86.ActiveCfg = Debug|x64
+		{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}.Debug|x86.Build.0 = Debug|x64
+		{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}.Release|ARM.ActiveCfg = Release|x64
+		{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}.Release|ARM.Build.0 = Release|x64
+		{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}.Release|ARM64.ActiveCfg = Release|x64
+		{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}.Release|ARM64.Build.0 = Release|x64
+		{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}.Release|x64.ActiveCfg = Release|x64
+		{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}.Release|x64.Build.0 = Release|x64
+		{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}.Release|x86.ActiveCfg = Release|x64
+		{C2F662DB-3ED6-47EE-A331-2EBE11AA36C3}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
