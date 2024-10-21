@@ -39,7 +39,7 @@ bool _Driver::Init()
 		AGEHUGAIUHVAR5 += 1;
 	}
 
-	DriverHandle = CreateFileA(E("\\\\.\\\{1ADA740B-77EF-4C51-AE18-786BBB2038C3}"), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+	DriverHandle = CreateFileA(E("\\\\.\\\{564c6c62-ee64-4097-8da1-c17137850a1c}"), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 	if (!DriverHandle || DriverHandle == INVALID_HANDLE_VALUE)
 	{
 		return false;

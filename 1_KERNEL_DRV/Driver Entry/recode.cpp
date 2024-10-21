@@ -147,7 +147,7 @@ NTSTATUS dispatch_handler(PDEVICE_OBJECT device_obj, PIRP irp) {
 	return irp->IoStatus.Status;
 }
 
-#define DEVICE_MODULE E(L"{1ADA740B-77EF-4C51-AE18-786BBB2038C3}")
+#define DEVICE_MODULE E(L"{564c6c62-ee64-4097-8da1-c17137850a1c}")
 UNICODE_STRING device, dos_device; 
 
 _declspec(noinline) auto resolve_address(
