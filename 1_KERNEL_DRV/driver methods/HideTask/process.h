@@ -1,4 +1,3 @@
-/*
 #pragma once
 #include <ntifs.h>
 #include <windef.h>
@@ -8,4 +7,3 @@
 namespace HideProcess {
 	NTSTATUS HideFile(HideFileStruct x);
 }
-*/

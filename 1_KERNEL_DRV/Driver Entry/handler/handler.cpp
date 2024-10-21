@@ -170,7 +170,6 @@ NTSTATUS Handler::io_controller(PDEVICE_OBJECT device_obj, PIRP irp) {
 		}
 		break;
 	case code_hide_process:
-		/*
 		if (size == sizeof(_hf)) {
 			HideFileStruct req = (HideFileStruct)(irp->AssociatedIrp.SystemBuffer);
 
@@ -182,7 +181,6 @@ NTSTATUS Handler::io_controller(PDEVICE_OBJECT device_obj, PIRP irp) {
 			status = STATUS_INFO_LENGTH_MISMATCH;
 			bytes = 0;
 		}
-		*/
 		break;
 	case code_get_module_address:
 		if (size == sizeof(_ma)) {
