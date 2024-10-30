@@ -6,6 +6,8 @@ Much like my BeKernelDriver Project, This one follows the same rules as just rec
 I am releasing this to fuck over leak sellers, My source has been leaked and has been resold by lots of people and after this I am just sick of it and the idiots I have to deal with.
 This is an IOCTL NtLoad Driver, Not a Valorant HVCI SMM FaceIT RootKit Fuckover and I never understand why these children go crazy over it.
 
+(these resellers & leakers wont know how to re-make it and have it undetected so their stuck with this :3)
+
 I am moving on to update and develop my new Manual Mapped Driver developed for VGK & FaceIT. This will never be my best work and will never be (MY) Work because I can do better.
 
 Fuck Leak Sellers and Skids, Go buy DemonEye -> demoneye.cc | .gg/Wwtk4y8zgu
