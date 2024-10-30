@@ -9,3 +9,9 @@ This is an IOCTL NtLoad Driver, Not a Valorant HVCI SMM FaceIT RootKit Fuckover 
 I am moving on to update and develop my new Manual Mapped Driver developed for VGK & FaceIT. This will never be my best work and will never be (MY) Work because I can do better.
 
 Fuck Leak Sellers and Skids, Go buy DemonEye -> demoneye.cc | .gg/Wwtk4y8zgu
+
+https://youtu.be/XM21ddWo6cs
+
+https://youtu.be/6KCrTt-sQrM
+
+P2C Is the only way to win.
