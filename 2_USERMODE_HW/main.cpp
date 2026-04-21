@@ -17,8 +17,8 @@
 #pragma comment(lib, "Crypt32.lib")
 #pragma comment(lib, "advapi32.lib")
 
-#define executableName "cs2.exe"
-#define windowTitle "Counter-Strike 2"
+#define executableName "any.exe"
+#define windowTitle "title"
 #define driverLocation "C:\\Windows\\System32\\Impl32.sys"
 bool DebugRead = TRUE;
 

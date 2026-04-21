@@ -78,7 +78,7 @@ void DllThread() {
 	SPOOF_FUNC;
 	while (TRUE) {
 		try {
-			int PIDr = Driver->FindProcessID(xorstr_("cs2.exe"));
+			int PIDr = Driver->FindProcessID(xorstr_("any.exe"));
 			if (PIDr != Driver->ProcessID || Driver->ProcessID == NULL || PIDr == NULL) {
 				Driver->BaseAddress = NULL;
 				Driver->ClientDLL = NULL;
@@ -91,7 +91,7 @@ void DllThread() {
 					Sleep(200);
 					uintptr_t Base = Driver->FindBaseAddress();
 					Sleep(200);
-					uintptr_t Client = Driver->FindModuleAddress(xorstr_("client.dll"));
+					uintptr_t Client = Driver->FindModuleAddress(xorstr_("any.dll"));
 					Sleep(200);
 
 					if (Base != NULL && Client != NULL && PIDr != NULL) {
